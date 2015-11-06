@@ -43,8 +43,8 @@ This document records current best practice for using all versions of HTTP over 
 
 HTTP version 1.1 {{RFC7230}} as well as HTTP version 2 {{RFC7540}} are defined
 to use TCP {{RFC0793}}, and their performance can depend greatly upon how TCP
-is configured. This document records best current practice for using HTTP over
-TCP, with a focus on improving end-user perceived performance.
+is configured. This document records the best current practice for using HTTP
+over TCP, with a focus on improving end-user perceived performance.
 
 These practices are generally applicable to HTTP/1 as well as HTTP/2, although
 some may note particular impact or nuance regarding a particular protocol
@@ -67,7 +67,7 @@ Your HTTP server or intermediary may need configuration changes to some system
 tunables and timeout periods to perform optimally. Actual values will depend
 on how you are scaling the platform, horizontally or vertically, and other
 connection semantics. Changing system limits and altering thresholds will
-change the behavior of your web service and it's dependencies, these
+change the behavior of your web service and its dependencies, these
 dependencies are usually common to other services running on the same system
 so good planning and testing is advised.
 
@@ -106,15 +106,15 @@ possible sockets, give it a larger range of local port numbers to use.
 
 ## Lower the TCP FIN timeout
 
-Lower the timeouts during which connections are in FIN-WAIT-2 state so that
-they can be re-used faster and thus increase number of simultaneous
-connections possible.
+Lower the time during which connections are in FIN-WAIT-2 state so that they
+can be re-used faster and thus increase number of simultaneous connections
+possible.
 
     net.ipv4.tcp_fin_timeout = <number of seconds>
 
 ## Re-use sockets in TIME_WAIT state
 
-Especially when running backend servers that are having edge servers fronting
+Especially when running backend servers that have edge servers fronting
 them to the Internet, allow reuse of sockets in TIME_WAIT state for new
 connections when it is safe from the network stack’s perspective.
 
@@ -126,7 +126,7 @@ Systems meant to handle and serve a huge number of TCP connections at high
 speeds need a significant amount of memory for TCP stack buffers. On some
 systems you can tell the TCP stack what default buffer sizes to use and how
 much they are allowed to dynamically grow and shrink. On a Linux system, you
-can control it like:
+can control it like this:
 
     net.ipv4.tcp_wmem = <minimum size> <default size> <max size in bytes>
     net.ipv4.tcp_rmem = <minimum size> <default size> <max size in bytes>
@@ -239,7 +239,7 @@ handle these connections with care.
 
 ## Half-close
 
-Client or server is free to half-close after a request or response has been
+The client or server is free to half-close after a request or response has been
 completed; or when there is no pending stream in HTTP/2.
 
 Half-closing is sometimes the only way for a server to make sure it closes
