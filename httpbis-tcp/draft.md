@@ -173,14 +173,18 @@ whether a connection is still active or required. e.g. If static assets
 typically return in 100s of milliseconds, and users 'switch off' after <10s
 keeping timeouts of >30s make little sense and defining a 'quality of service'
 appropriate to the target platform is encouraged. On a shared platform with
-mixed workloads applications that require longer render times have various
-options such as HTTP continuations, redirects, 202s or similar.
+mixed session lifetimes, applications that require longer render times have various
+options to ensure the underlying service and upstream servers in the path can
+identify the session as not failed: HTTP continuations, Redirects, 202s or
+sending data.
 
 Clients and servers typically have many timeout options, a few notable options
 are: Connect(client), time to request(server), time to first byte(client),
 between bytes(server/client), total connection time(server/client). Some
 implementations merge these values into a single 'timeout' definition even
-when statistics are reported individually.
+when statistics are reported individually. All should be considered as the
+defaults in many implementations are highly underiable, even infinite timeouts
+have been observed.
 
 # TCP handshake
 
