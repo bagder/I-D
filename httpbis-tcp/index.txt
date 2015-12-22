@@ -4,8 +4,8 @@
 
 httpbis                                                      D. Stenberg
 Internet-Draft                                                   Mozilla
-Intended status: Best Current Practice                 November 13, 2015
-Expires: May 16, 2016
+Intended status: Best Current Practice                 December 22, 2015
+Expires: June 24, 2016
 
 
                           TCP Tuning for HTTP
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 16, 2016.
+   This Internet-Draft will expire on June 24, 2016.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 1]
+Stenberg                  Expires June 24, 2016                 [Page 1]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
 Table of Contents
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 2]
+Stenberg                  Expires June 24, 2016                 [Page 2]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
    These practices are generally applicable to HTTP/1 as well as HTTP/2,
@@ -165,9 +165,9 @@ Internet-Draft                TCP for HTTP                 November 2015
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 3]
+Stenberg                  Expires June 24, 2016                 [Page 3]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
 2.3.  Number of incoming TCP SYNs allowed to backlog
@@ -221,9 +221,9 @@ Internet-Draft                TCP for HTTP                 November 2015
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 4]
+Stenberg                  Expires June 24, 2016                 [Page 4]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
    The minimum and default tend to require less proactive amendment than
@@ -277,9 +277,9 @@ Internet-Draft                TCP for HTTP                 November 2015
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 5]
+Stenberg                  Expires June 24, 2016                 [Page 5]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
    to first byte(client), between bytes(server/client), total connection
@@ -333,9 +333,9 @@ Internet-Draft                TCP for HTTP                 November 2015
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 6]
+Stenberg                  Expires June 24, 2016                 [Page 6]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
 4.  TCP transfers
@@ -389,9 +389,9 @@ Internet-Draft                TCP for HTTP                 November 2015
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 7]
+Stenberg                  Expires June 24, 2016                 [Page 7]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
    net.ipv4.tcp_slow_start_after_idle = 0
@@ -445,9 +445,9 @@ Internet-Draft                TCP for HTTP                 November 2015
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 8]
+Stenberg                  Expires June 24, 2016                 [Page 8]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
 7.  IANA Considerations
@@ -501,9 +501,9 @@ Internet-Draft                TCP for HTTP                 November 2015
 
 
 
-Stenberg                  Expires May 16, 2016                  [Page 9]
+Stenberg                  Expires June 24, 2016                 [Page 9]
 
-Internet-Draft                TCP for HTTP                 November 2015
+Internet-Draft                TCP for HTTP                 December 2015
 
 
    [RFC7141]  Briscoe, B. and J. Manner, "Byte and Packet Congestion
@@ -557,4 +557,4 @@ Author's Address
 
 
 
-Stenberg                  Expires May 16, 2016                 [Page 10]
+Stenberg                  Expires June 24, 2016                [Page 10]
