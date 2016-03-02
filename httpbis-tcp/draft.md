@@ -249,6 +249,47 @@ In POSIX systems you switch it off like this:
     int one = 1;
     setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
 
+## Delayed ACKs
+
+Delayed ACK {{RFC 1122}} is a mechanism enabled in most TCP stacks that causes
+the stack to delay sending acknowledgement packets in response to data. The ACK
+is delayed up until a certain threshold, or until the peer has some data to
+send, in which case the ACK will be sent along with that data. Depending on the
+traffic flow and TCP stack this delay can be as long as 500ms.
+
+This interacts poorly with peers that have Nagle's Algorithm enabled. Because
+Nagle's Algorithm delays sending until either one MSS of data is provided *or*
+until an ACK is received for all sent data, delaying ACKs can force Nagle's
+Algorithm to buffer packets when it doesn't need to (that is, when the other
+peer has already processed the outstanding data).
+
+Delayed ACKs are most useful in situations where it is reasonable to assume
+that a data packet will almost immediately (within 500ms) cause data to be sent
+in the other direction. In general in both HTTP/1.1 and HTTP/2 this is
+unlikely: therefore, disabling Delayed ACKs can provide an improvement in
+latency.
+
+However, the TLS handshake is a clear exception to this case. For the duration
+of the TLS handshake it is likely to be useful to keep Delayed ACKs enabled.
+
+Additionally, for low-latency servers that can guarantee responses to requests
+within 500ms, on long-running connections (such as HTTP/2), and when requests
+are small enough to fit within a small packet, leaving delayed ACKs turned on
+may provide minor performance benefits.
+
+On recent Linux kernels (since Linux 2.4.4), Delayed ACKs can be disabled like
+this:
+
+    int one = 1;
+    setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
+
+Unlike disabling Nagle's Algorithm, disabling Delayed ACKs on Linux is not a
+one-time operation: processing within the TCP stack can cause Delayed ACKs to
+be re-enabled. As a result, to use `TCP_QUICKACK` effectively requires setting
+and unsetting the socket option during the life of the connection.
+
+Effective use of this setting requires extensive profiling.
+
 ## Keep-alive
 
 TCP keep-alive is likely disabled - at least on mobile clients for energy
