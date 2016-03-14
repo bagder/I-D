@@ -76,37 +76,28 @@ so good planning and testing is advised.
 This is a list of values to consider and some general advice on how those
 values can be modified on Linux systems.
 
-## Number of open files
+## Number of open files    {#open-files}
 
 A modern HTTP server will serve a large number of TCP connections and in most
 systems each open socket equals an open file. Make sure that limit isn't a
-bottle neck. In Linux, the limit can be raised like this:
+bottle neck.
 
-    fs.file-max = <number of files>
-
-## Number of concurrent network messages
+## Number of concurrent network messages   {#concurrent-messages}
 
 Raise the number of packets allowed to get queued when a particular interface
-receives packets faster than the kernel can process them. In Linux, this limit
-can be raised like this:
+receives packets faster than the kernel can process them.
 
-    net.core.netdev_max_backlog = <number of packets>
-
-## Number of incoming TCP SYNs allowed to backlog
+## Number of incoming TCP SYNs allowed to backlog  {#syn-backlog}
 
 The number of new connection requests that are allowed to queue up in the
-kernel. In Linux, this limit can be raised like this:
+kernel.
 
-    net.core.somaxconn = <number>
-
-## Use the whole port range for local ports
+## Use the whole port range for local ports   {#local-ports}
 
 To make sure the TCP stack can take full advantage of the entire set of
 possible sockets, give it a larger range of local port numbers to use.
 
-    net.ipv4.ip_local_port_range = 1024 65535
-
-## Lower the TCP FIN timeout
+## Lower the TCP FIN timeout    {#fin-timeout}
 
 High connection completion rates will consume ephemeral ports quickly.  Lower
 the time during which connections are in FIN-WAIT-2/TIME_WAIT states so that
@@ -114,27 +105,19 @@ they can be purged faster and thus maintain a maximal number of available
 sockets. The primitives for the assignment of these values were described in
 {{RFC0793}}, however significantly lower values are commonly used.
 
-    net.ipv4.tcp_fin_timeout = <number of seconds>
-
-## Reuse sockets in TIME_WAIT state
+## Reuse sockets in TIME_WAIT state   {#reuse-sockets}
 
 When running backend servers on a managed, low latency network you might allow
 the reuse of sockets in TIME_WAIT state for new connections when a protocol
 complete termination has occurred. There is no RFC that covers this behaviour.
 
-    net.ipv4.tcp_tw_reuse = 1
-
-## TCP socket buffer sizes and Window Scaling
+## TCP socket buffer sizes and Window Scaling   {#socket-buffers}
 
 Systems meant to handle and serve a huge number of TCP connections at high
 speeds need a significant amount of memory for TCP socket buffers. On some
 systems you can tell the TCP stack what default buffer sizes to use and how
 much they are allowed to dynamically grow and shrink.  Window Scaling is
-typically linked to socket buffer sizes and on a Linux system can be
-controlled with the values:
-
-    net.ipv4.tcp_wmem = <minimum size> <default size> <max size in bytes>
-    net.ipv4.tcp_rmem = <minimum size> <default size> <max size in bytes>
+typically linked to socket buffer sizes.
 
 The minimum and default tend to require less proactive amendment than the
 maximum value. When deriving maximum values for use, you should consider the
@@ -150,15 +133,12 @@ mitigate this undesirable behaviour {{RFC7141}}.
 
 {{RFC7323}} covers Window Scaling in greater detail.
 
-## Set maximum allowed TCP window sizes
+## Set maximum allowed TCP window sizes  {#max-window}
 
 You may have to increase the largest allowed window size. Window scaling must
 be accommodated within the maximal values, however it is not uncommon to see
 the maximum definable higher than the scalable limit; these values can
-statically defined within socket parameters (SO_RCVBUF,SO_SNDBUF)
-
-    net.core.rmem_max = <number of bytes>
-    net.core.wmem_max = <number of bytes>
+statically defined within socket parameters (SO_RCVBUF,SO_SNDBUF).
 
 ## Timers and timeouts
 
@@ -230,7 +210,7 @@ TBD
 
 Apple [deploying in iOS and OSX](https://developer.apple.com/videos/wwdc/2015/?id=719).
 
-## Nagle's Algorithm
+## Nagle's Algorithm       {#nagle}
 
 Nagle's Algorithm {{RFC0896}} is the mechanism that makes the TCP stack hold
 (small) outgoing packets for a short period of time so that it can
@@ -257,17 +237,12 @@ to detect failed peers or connections reset by stateful firewalls etc.
 
 # Re-using connections
 
-## Slow Start after Idle
+## Slow Start after Idle       {#slow-start}
 
 Slow-start is one of the algorithms that TCP uses to control congestion inside
 the network. It is also known as the exponential growth phase. Each TCP
 connection will start off in slow-start but will also go back to slow-start
 after a certain amount of idle time.
-
-In Linux systems you can prevent the TCP stack from going back to slow-start
-after idle by settting
-
-    net.ipv4.tcp_slow_start_after_idle = 0
 
 ## TCP-Bound Authentications
 
@@ -321,3 +296,56 @@ TBD
 
 This specification builds upon previous work and help from
 Mark Nottingham, Craig Taylor
+
+# Operating System Settings for Linux
+
+Here are some sample operating system settings for the Linux operating system, along with the section it refers to.
+
+{{open-files}}
+
+    fs.file-max = <number of files>
+
+{{concurrent-messages}}
+
+    net.core.netdev_max_backlog = <number of packets>
+
+{{syn-backlog}}
+
+    net.core.somaxconn = <number>
+
+{{local-ports}}
+
+    net.ipv4.ip_local_port_range = 1024 65535
+
+{{fin-timeout}}
+
+    net.ipv4.tcp_fin_timeout = <number of seconds>
+
+{{reuse-sockets}}
+
+    net.ipv4.tcp_tw_reuse = 1
+
+{{socket-buffers}}
+
+    net.ipv4.tcp_wmem = <minimum size> <default size> <max size in bytes>
+
+{{socket-buffers}}
+
+    net.ipv4.tcp_rmem = <minimum size> <default size> <max size in bytes>
+
+{{max-window}}
+
+    net.core.rmem_max = <number of bytes>
+
+{{max-window}}
+
+    net.core.wmem_max = <number of bytes>
+
+{{slow-start}}
+
+    net.ipv4.tcp_slow_start_after_idle = 0
+
+{{nagle}} Turning off Nagle's Algorithm:
+
+    int one = 1;
+    setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
