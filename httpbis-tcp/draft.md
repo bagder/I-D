@@ -263,7 +263,7 @@ until an ACK is received for all sent data, delaying ACKs can force Nagle's
 Algorithm to buffer packets when it doesn't need to (that is, when the other
 peer has already processed the outstanding data).
 
-Delayed ACKs are most useful in situations where it is reasonable to assume
+Delayed ACKs can be useful in situations where it is reasonable to assume
 that a data packet will almost immediately (within 500ms) cause data to be sent
 in the other direction. In general in both HTTP/1.1 and HTTP/2 this is
 unlikely: therefore, disabling Delayed ACKs can provide an improvement in
