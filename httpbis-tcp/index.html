@@ -419,7 +419,7 @@
 
   <meta name="dct.creator" content="Stenberg, D." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-stenberg-httpbis-tcp-02" />
-  <meta name="dct.issued" scheme="ISO8601" content="2015" />
+  <meta name="dct.issued" scheme="ISO8601" content="2016-3-16" />
   <meta name="dct.abstract" content="This document records current best practice for using all versions of HTTP over TCP." />
   <meta name="description" content="This document records current best practice for using all versions of HTTP over TCP." />
 
@@ -440,7 +440,7 @@
 </tr>
 <tr>
   <td class="left">Intended status: Best Current Practice</td>
-  <td class="right">2015</td>
+  <td class="right">March 16, 2016</td>
 </tr>
 <tr>
   <td class="left">Expires: September 17, 2016</td>
@@ -468,7 +468,7 @@
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
-<p>Copyright (c) 2015 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
+<p>Copyright (c) 2016 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (http://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
 
   
@@ -532,7 +532,7 @@
 <h1 id="rfc.section.2.2"><a href="#rfc.section.2.2">2.2.</a> <a href="#concurrent-messages" id="concurrent-messages">Number of concurrent network messages</a></h1>
 <p id="rfc.section.2.2.p.1">Raise the number of packets allowed to get queued when a particular interface receives packets faster than the kernel can process them.</p>
 <h1 id="rfc.section.2.3"><a href="#rfc.section.2.3">2.3.</a> <a href="#syn-backlog" id="syn-backlog">Number of incoming TCP SYNs allowed to backlog</a></h1>
-<p id="rfc.section.2.3.p.1">The number of new connection requests that are allowed to queue up in the kernel.</p>
+<p id="rfc.section.2.3.p.1">The number of new connection requests that are allowed to queue up in the kernel. These can be connections that are in SYN RECEIVED or ESTABLISHED states. Historically, operating systems used a single backlog queue for both of these states. Newer implemntations use two separate queues: one for connections in SYN RECEIVED and one for those which are ESTABLISHED state (better known as the accept queue).</p>
 <h1 id="rfc.section.2.4"><a href="#rfc.section.2.4">2.4.</a> <a href="#local-ports" id="local-ports">Use the whole port range for local ports</a></h1>
 <p id="rfc.section.2.4.p.1">To make sure the TCP stack can take full advantage of the entire set of possible sockets, give it a larger range of local port numbers to use.</p>
 <h1 id="rfc.section.2.5"><a href="#rfc.section.2.5">2.5.</a> <a href="#fin-timeout" id="fin-timeout">Lower the TCP FIN timeout</a></h1>

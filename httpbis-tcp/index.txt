@@ -4,7 +4,7 @@
 
 httpbis                                                      D. Stenberg
 Internet-Draft                                                   Mozilla
-Intended status: Best Current Practice                              2015
+Intended status: Best Current Practice                    March 16, 2016
 Expires: September 17, 2016
 
 
@@ -35,7 +35,7 @@ Status of This Memo
 
 Copyright Notice
 
-   Copyright (c) 2015 IETF Trust and the persons identified as the
+   Copyright (c) 2016 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -55,7 +55,7 @@ Copyright Notice
 
 Stenberg               Expires September 17, 2016               [Page 1]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
 Table of Contents
@@ -111,7 +111,7 @@ Table of Contents
 
 Stenberg               Expires September 17, 2016               [Page 2]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
    current practice for using HTTP over TCP, with a focus on improving
@@ -160,15 +160,19 @@ Internet-Draft                TCP for HTTP                          2015
 2.3.  Number of incoming TCP SYNs allowed to backlog
 
    The number of new connection requests that are allowed to queue up in
-   the kernel.
-
+   the kernel.  These can be connections that are in SYN RECEIVED or
+   ESTABLISHED states.  Historically, operating systems used a single
 
 
 
 Stenberg               Expires September 17, 2016               [Page 3]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
+
+   backlog queue for both of these states.  Newer implemntations use two
+   separate queues: one for connections in SYN RECEIVED and one for
+   those which are ESTABLISHED state (better known as the accept queue).
 
 2.4.  Use the whole port range for local ports
 
@@ -215,16 +219,14 @@ Internet-Draft                TCP for HTTP                          2015
    coupled with AQM can help mitigate this undesirable behaviour
    [RFC7141].
 
-   [RFC7323] covers Window Scaling in greater detail.
-
-
-
 
 
 Stenberg               Expires September 17, 2016               [Page 4]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
+
+   [RFC7323] covers Window Scaling in greater detail.
 
 2.8.  Set maximum allowed TCP window sizes
 
@@ -272,16 +274,16 @@ Internet-Draft                TCP for HTTP                          2015
 
    TFO requires both client and server support, and additionally
    requires application knowledge, because the data sent on the SYN
-   needs to be idempotent.  Therefore, TFO can only be used on
-   idempotent, safe HTTP methods (e.g., GET and HEAD), or with
 
 
 
 Stenberg               Expires September 17, 2016               [Page 5]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
+   needs to be idempotent.  Therefore, TFO can only be used on
+   idempotent, safe HTTP methods (e.g., GET and HEAD), or with
    intervening negotiation (e.g, using TLS).  It should be noted that
    TFO requires a secret to be defined on the server to mitigate
    security vulnerabilities it introduces.  TFO therefore requires more
@@ -331,11 +333,9 @@ Internet-Draft                TCP for HTTP                          2015
 
 
 
-
-
 Stenberg               Expires September 17, 2016               [Page 6]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
    HTTP/1.1 is also affected, especially when sending off a full request
@@ -391,7 +391,7 @@ Internet-Draft                TCP for HTTP                          2015
 
 Stenberg               Expires September 17, 2016               [Page 7]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
    long-lived requests to detect failed peers or connections reset by
@@ -447,7 +447,7 @@ Internet-Draft                TCP for HTTP                          2015
 
 Stenberg               Expires September 17, 2016               [Page 8]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
    that a connection will successfully get reused by a web browser is
@@ -503,7 +503,7 @@ Internet-Draft                TCP for HTTP                          2015
 
 Stenberg               Expires September 17, 2016               [Page 9]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
    [RFC4987]  Eddy, W., "TCP SYN Flooding Attacks and Common
@@ -559,7 +559,7 @@ Appendix B.  Operating System Settings for Linux
 
 Stenberg               Expires September 17, 2016              [Page 10]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
    net.core.somaxconn = <number>
@@ -615,7 +615,7 @@ Internet-Draft                TCP for HTTP                          2015
 
 Stenberg               Expires September 17, 2016              [Page 11]
 
-Internet-Draft                TCP for HTTP                          2015
+Internet-Draft                TCP for HTTP                    March 2016
 
 
    Unlike disabling Nagle's Algorithm, disabling Delayed ACKs on Linux
