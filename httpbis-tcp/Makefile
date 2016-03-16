@@ -10,7 +10,7 @@ idnits ?= idnits
 
 title = stenberg-$(shell basename ${CURDIR})
 #latest = $(shell (ls draft-${title}-*.xml || echo "draft-${title}-00.xml") | sort | tail -1)
-latest = "draft-${title}-01"
+latest = "draft-${title}-02"
 version = $(shell basename ${latest} .xml | awk -F- '{print $$NF}')
 
 target = draft-$(title)-$(version)
