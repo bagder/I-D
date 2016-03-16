@@ -9,7 +9,7 @@ Expires: September 17, 2016
 
 
                           TCP Tuning for HTTP
-                     draft-stenberg-httpbis-tcp-01
+                     draft-stenberg-httpbis-tcp-02
 
 Abstract
 
