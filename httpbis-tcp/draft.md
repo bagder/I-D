@@ -91,7 +91,11 @@ receives packets faster than the kernel can process them.
 ## Number of incoming TCP SYNs allowed to backlog  {#syn-backlog}
 
 The number of new connection requests that are allowed to queue up in the
-kernel.
+kernel. These can be connections that are in SYN RECEIVED or ESTABLISHED 
+states. Historically, operating systems used a single backlog queue for both 
+of these states. Newer implemntations use two separate queues: one for 
+connections in SYN RECEIVED and one for those which are ESTABLISHED state 
+(better known as the accept queue). 
 
 ## Use the whole port range for local ports   {#local-ports}
 
