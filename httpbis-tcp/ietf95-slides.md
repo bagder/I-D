@@ -10,7 +10,11 @@ slides.md
 ---
 # Why do this?
 
-## Guidance on Best Practices for HTTP servers
+## Guidance on Best Practices for HTTP servers, clients and intermediaries.
+
+Lots of time and effort have been spent learning and getting these experiences
+and this knowledge. This document should help lowering the bar for new
+implementers.
 
 ## Advice for implementors. 
 
