@@ -76,8 +76,8 @@ Table of Contents
      3.1.  TCP Fast Open . . . . . . . . . . . . . . . . . . . . . .   6
      3.2.  Initial Congestion Window . . . . . . . . . . . . . . . .   6
      3.3.  TCP SYN flood handling  . . . . . . . . . . . . . . . . .   6
-   4.  TCP transfers . . . . . . . . . . . . . . . . . . . . . . . .   6
-     4.1.  Packet Pacing . . . . . . . . . . . . . . . . . . . . . .   6
+   4.  TCP transfers . . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.1.  Packet Pacing . . . . . . . . . . . . . . . . . . . . . .   7
      4.2.  Explicit Congestion Control . . . . . . . . . . . . . . .   7
      4.3.  Nagle's Algorithm . . . . . . . . . . . . . . . . . . . .   7
      4.4.  Keep-alive  . . . . . . . . . . . . . . . . . . . . . . .   7
@@ -89,7 +89,7 @@ Table of Contents
      6.2.  Abort . . . . . . . . . . . . . . . . . . . . . . . . . .   8
      6.3.  Close Idle Connections  . . . . . . . . . . . . . . . . .   8
      6.4.  Tail Loss Probes  . . . . . . . . . . . . . . . . . . . .   8
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   8
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
@@ -267,13 +267,13 @@ Internet-Draft                TCP for HTTP                 November 2015
    milliseconds, and users 'switch off' after <10s keeping timeouts of
    >30s make little sense and defining a 'quality of service'
    appropriate to the target platform is encouraged.  On a shared
-   platform with mixed workloads applications that require longer render
-   times have various options such as HTTP continuations, redirects,
-   202s or similar.
+   platform with mixed session lifetimes, applications that require
+   longer render times have various options to ensure the underlying
+   service and upstream servers in the path can identify the session as
+   not failed: HTTP continuations, Redirects, 202s or sending data.
 
    Clients and servers typically have many timeout options, a few
    notable options are: Connect(client), time to request(server), time
-   to first byte(client), between bytes(server/client), total connection
 
 
 
@@ -282,9 +282,12 @@ Stenberg                  Expires May 16, 2016                  [Page 5]
 Internet-Draft                TCP for HTTP                 November 2015
 
 
+   to first byte(client), between bytes(server/client), total connection
    time(server/client).  Some implementations merge these values into a
    single 'timeout' definition even when statistics are reported
-   individually.
+   individually.  All should be considered as the defaults in many
+   implementations are highly underiable, even infinite timeouts have
+   been observed.
 
 3.  TCP handshake
 
@@ -323,11 +326,8 @@ Internet-Draft                TCP for HTTP                 November 2015
    TCP SYN Flood mitigations [RFC4987] are necessary and there will be
    thresholds to tweak.
 
-4.  TCP transfers
 
-4.1.  Packet Pacing
 
-   TBD
 
 
 
@@ -337,6 +337,12 @@ Stenberg                  Expires May 16, 2016                  [Page 6]
 
 Internet-Draft                TCP for HTTP                 November 2015
 
+
+4.  TCP transfers
+
+4.1.  Packet Pacing
+
+   TBD
 
 4.2.  Explicit Congestion Control
 
@@ -381,18 +387,14 @@ Internet-Draft                TCP for HTTP                 November 2015
    In Linux systems you can prevent the TCP stack from going back to
    slow-start after idle by settting
 
-   net.ipv4.tcp_slow_start_after_idle = 0
-
-
-
-
-
 
 
 Stenberg                  Expires May 16, 2016                  [Page 7]
 
 Internet-Draft                TCP for HTTP                 November 2015
 
+
+   net.ipv4.tcp_slow_start_after_idle = 0
 
 5.2.  TCP-Bound Authentications
 
@@ -436,9 +438,7 @@ Internet-Draft                TCP for HTTP                 November 2015
 
    draft [2]
 
-7.  IANA Considerations
 
-   This document does not require action from IANA.
 
 
 
@@ -449,6 +449,10 @@ Stenberg                  Expires May 16, 2016                  [Page 8]
 
 Internet-Draft                TCP for HTTP                 November 2015
 
+
+7.  IANA Considerations
+
+   This document does not require action from IANA.
 
 8.  Security Considerations
 
@@ -492,10 +496,6 @@ Internet-Draft                TCP for HTTP                 November 2015
               RFC6928, April 2013,
               <http://www.rfc-editor.org/info/rfc6928>.
 
-   [RFC7141]  Briscoe, B. and J. Manner, "Byte and Packet Congestion
-              Notification", BCP 41, RFC 7141, DOI 10.17487/RFC7141,
-              February 2014, <http://www.rfc-editor.org/info/rfc7141>.
-
 
 
 
@@ -505,6 +505,10 @@ Stenberg                  Expires May 16, 2016                  [Page 9]
 
 Internet-Draft                TCP for HTTP                 November 2015
 
+
+   [RFC7141]  Briscoe, B. and J. Manner, "Byte and Packet Congestion
+              Notification", BCP 41, RFC 7141, DOI 10.17487/RFC7141,
+              February 2014, <http://www.rfc-editor.org/info/rfc7141>.
 
    [RFC7323]  Borman, D., Braden, B., Jacobson, V., and R.
               Scheffenegger, Ed., "TCP Extensions for High Performance",
@@ -533,10 +537,6 @@ Author's Address
 
    Email: daniel@haxx.se
    URI:   http://daniel.haxx.se
-
-
-
-
 
 
 
