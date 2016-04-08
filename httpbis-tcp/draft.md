@@ -116,34 +116,49 @@ When running backend servers on a managed, low latency network you might allow
 the reuse of sockets in TIME_WAIT state for new connections when a protocol
 complete termination has occurred. There is no RFC that covers this behaviour.
 
-## TCP socket buffer sizes and Window Scaling   {#socket-buffers}
+## TCP socket buffer sizes {#socket-buffers}
 
 Systems meant to handle and serve a huge number of TCP connections at high
-speeds need a significant amount of memory for TCP socket buffers. On some
-systems you can tell the TCP stack what default buffer sizes to use and how
-much they are allowed to dynamically grow and shrink.  Window Scaling is
-typically linked to socket buffer sizes.
+speeds can require significant amounts of memory for TCP socket buffers to
+maintain performance. On some systems you can tell the TCP stack what default
+buffer sizes to use and how much they are allowed to dynamically grow and
+shrink.  Window Scaling is typically linked to socket buffer sizes.
 
-The minimum and default tend to require less proactive amendment than the
-maximum value. When deriving maximum values for use, you should consider the
-BDP (Bandwidth Delay Product) of the target environment and clients.  Consider
-also that 'read' and 'write' values do not require to be synchronised, as the
-BDP requirements for a load balancer or middle-box might be very different
-when acting as a sender or receiver.
+The minimum and default values for socket buffers tend to require less
+proactive amendment than the maximum value. When deriving maximum values for
+use, you should consider the BDP (Bandwidth Delay Product) of the target
+environment and client paths.  Consider also that 'read' and 'write' values do
+not require to be synchronised, as the BDP for a load balancer or middle-box
+might be very different when acting as a sender or receiver due to the network
+charateristics in either context. e.g. A cache with fast, low latency network
+to an origin serving high latency clients.
 
 Allowing needlessly high values beyond the expected limitations of the
-platform might increase the probability of retransmissions and buffer induced
-delays within the path. Extensions such as ECN coupled with AQM can help
-mitigate this undesirable behaviour {{RFC7141}}.
+platform will not improve performance however can cause buffer induced
+delays within the path or excessive retransmissions during congestion events.
+Extensions such as ECN coupled with AQM can help mitigate this undesirable
+behaviour {{RFC7141}}.
 
-{{RFC7323}} covers Window Scaling in greater detail.
+## TCP Window Scaling  {#window-scaling}
 
-## Set maximum allowed TCP window sizes  {#max-window}
+Window Scaling is provided as a function of the congestion control algorithm
+used on a platform. Initial and maximal values can usually be configured.
 
-You may have to increase the largest allowed window size. Window scaling must
-be accommodated within the maximal values, however it is not uncommon to see
-the maximum definable higher than the scalable limit; these values can
+The window size used at connection startup is a calculated value using the MSS
+discovered during the 3WHS and the Initial Window (IW) in both send and
+receive contexts (initcwnd and initrwnd). {{RFC7323}} covers Window Scaling in
+greater detail.
+
+You may have to increase the largest allowed window size from the system
+default to increase the throuput for high latency clients. Window scaling
+must be accommodated within the maximal values, however it is not uncommon to
+see the maximum definable higher than the scalable limit; these values can be
 statically defined within socket parameters (SO_RCVBUF,SO_SNDBUF).
+
+Changes to the size of the window or incomplete window usage are common
+secondary symptoms of 'slow transfer rates' on a loss free path. Locating the
+root cause of these symptoms, usually on the client or server system, is an
+important step commonly overlooked in favour of blaming the path.
 
 ## Timers and timeouts
 
@@ -171,7 +186,7 @@ when statistics are reported individually. All should be considered as the
 defaults in many implementations are highly underiable, even infinite timeouts
 have been observed.
 
-# TCP handshake
+# TCP handshake  {#tcp-handshake}
 
 ## TCP Fast Open
 
@@ -190,15 +205,16 @@ server side deployment planning than other enhancements.
 Support for TFO is growing in client platforms, especially mobile, due to the
 significant performance advantage it gives.
 
-## Initial Congestion Window
+## Initial Window  {#IW}
 
-{{RFC6928}} specifies an initcwnd (initial congestion window) of 10, and is
-now fairly widely deployed server-side. There has been experimentation with
-larger initial windows, in combination with packet pacing. Many
-implementations allow initcwnd to be applied to specific routes which allows a
-greater degree of flexibility than some other TCP parameters.
+{{RFC6928}} proposes a new IW of 10*MSS, and is now fairly widely deployed
+server-side. Many implementations allow you to tune both initcwnd and initrwnd
+values. Some implementations allow these values to be applied to specific
+routes which allows a greater degree of control over known paths.
 
-IW10 has been reported to perform fairly well even in high volume servers.
+There has been experimentation with larger initial windows in combination with
+packet pacing, however IW10 has been reported to perform fairly well even in
+both general and high volume use cases.
 
 ## TCP SYN flood handling
 
@@ -207,9 +223,12 @@ thresholds to tweak.
 
 # TCP transfers
 
-## Packet Pacing
+## Packet scheduling and flow control
 
 TBD
+cubic
+codel
+pacing
 
 ## Explicit Congestion Control
 
