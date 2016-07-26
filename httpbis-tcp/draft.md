@@ -387,11 +387,11 @@ Here are some sample operating system settings for the Linux operating system, a
 
     net.ipv4.tcp_rmem = <minimum size> <default size> <max size in bytes>
 
-{{max-window}}
+{{window-scaling}}
 
     net.core.rmem_max = <number of bytes>
 
-{{max-window}}
+{{window-scaling}}
 
     net.core.wmem_max = <number of bytes>
 
