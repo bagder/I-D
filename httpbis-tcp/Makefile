@@ -19,7 +19,7 @@ next = draft-$(title)-$(shell printf "%.2d" `echo ${version}+1 | bc`)
 
 .PHONY: latest clean next diff idnits update
 
-latest: $(target).html $(target).txt index.html index.txt
+latest: $(target).html $(target).txt $(target).xml index.html index.txt
 
 clean:
 	rm -f $(target).html $(target).txt
