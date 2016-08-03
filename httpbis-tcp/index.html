@@ -383,15 +383,15 @@
 <link href="#rfc.section.2.4" rel="Chapter" title="2.4 Use the whole port range for local ports"/>
 <link href="#rfc.section.2.5" rel="Chapter" title="2.5 Lower the TCP FIN timeout"/>
 <link href="#rfc.section.2.6" rel="Chapter" title="2.6 Reuse sockets in TIME_WAIT state"/>
-<link href="#rfc.section.2.7" rel="Chapter" title="2.7 TCP socket buffer sizes and Window Scaling"/>
-<link href="#rfc.section.2.8" rel="Chapter" title="2.8 Set maximum allowed TCP window sizes"/>
+<link href="#rfc.section.2.7" rel="Chapter" title="2.7 TCP socket buffer sizes"/>
+<link href="#rfc.section.2.8" rel="Chapter" title="2.8 TCP Window Scaling"/>
 <link href="#rfc.section.2.9" rel="Chapter" title="2.9 Timers and timeouts"/>
 <link href="#rfc.section.3" rel="Chapter" title="3 TCP handshake"/>
 <link href="#rfc.section.3.1" rel="Chapter" title="3.1 TCP Fast Open"/>
-<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Initial Congestion Window"/>
+<link href="#rfc.section.3.2" rel="Chapter" title="3.2 Initial Window"/>
 <link href="#rfc.section.3.3" rel="Chapter" title="3.3 TCP SYN flood handling"/>
 <link href="#rfc.section.4" rel="Chapter" title="4 TCP transfers"/>
-<link href="#rfc.section.4.1" rel="Chapter" title="4.1 Packet Pacing"/>
+<link href="#rfc.section.4.1" rel="Chapter" title="4.1 Packet scheduling and flow control"/>
 <link href="#rfc.section.4.2" rel="Chapter" title="4.2 Explicit Congestion Control"/>
 <link href="#rfc.section.4.3" rel="Chapter" title="4.3 Nagle&#x2019;s Algorithm"/>
 <link href="#rfc.section.4.4" rel="Chapter" title="4.4 Delayed ACKs"/>
@@ -419,7 +419,7 @@
 
   <meta name="dct.creator" content="Stenberg, D." />
   <meta name="dct.identifier" content="urn:ietf:id:draft-stenberg-httpbis-tcp-02" />
-  <meta name="dct.issued" scheme="ISO8601" content="2016-3-16" />
+  <meta name="dct.issued" scheme="ISO8601" content="2016-8-3" />
   <meta name="dct.abstract" content="This document records current best practice for using all versions of HTTP over TCP." />
   <meta name="description" content="This document records current best practice for using all versions of HTTP over TCP." />
 
@@ -440,10 +440,10 @@
 </tr>
 <tr>
   <td class="left">Intended status: Best Current Practice</td>
-  <td class="right">March 16, 2016</td>
+  <td class="right">August 3, 2016</td>
 </tr>
 <tr>
-  <td class="left">Expires: September 17, 2016</td>
+  <td class="left">Expires: February 4, 2017</td>
   <td class="right"></td>
 </tr>
 
@@ -464,7 +464,7 @@
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at http://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on September 17, 2016.</p>
+<p>This Internet-Draft will expire on February 4, 2017.</p>
 <h1 id="rfc.copyrightnotice">
   <a href="#rfc.copyrightnotice">Copyright Notice</a>
 </h1>
@@ -485,15 +485,15 @@
 <li>2.4.   <a href="#rfc.section.2.4">Use the whole port range for local ports</a></li>
 <li>2.5.   <a href="#rfc.section.2.5">Lower the TCP FIN timeout</a></li>
 <li>2.6.   <a href="#rfc.section.2.6">Reuse sockets in TIME_WAIT state</a></li>
-<li>2.7.   <a href="#rfc.section.2.7">TCP socket buffer sizes and Window Scaling</a></li>
-<li>2.8.   <a href="#rfc.section.2.8">Set maximum allowed TCP window sizes</a></li>
+<li>2.7.   <a href="#rfc.section.2.7">TCP socket buffer sizes</a></li>
+<li>2.8.   <a href="#rfc.section.2.8">TCP Window Scaling</a></li>
 <li>2.9.   <a href="#rfc.section.2.9">Timers and timeouts</a></li>
 </ul><li>3.   <a href="#rfc.section.3">TCP handshake</a></li>
 <ul><li>3.1.   <a href="#rfc.section.3.1">TCP Fast Open</a></li>
-<li>3.2.   <a href="#rfc.section.3.2">Initial Congestion Window</a></li>
+<li>3.2.   <a href="#rfc.section.3.2">Initial Window</a></li>
 <li>3.3.   <a href="#rfc.section.3.3">TCP SYN flood handling</a></li>
 </ul><li>4.   <a href="#rfc.section.4">TCP transfers</a></li>
-<ul><li>4.1.   <a href="#rfc.section.4.1">Packet Pacing</a></li>
+<ul><li>4.1.   <a href="#rfc.section.4.1">Packet scheduling and flow control</a></li>
 <li>4.2.   <a href="#rfc.section.4.2">Explicit Congestion Control</a></li>
 <li>4.3.   <a href="#rfc.section.4.3">Nagle&#8217;s Algorithm</a></li>
 <li>4.4.   <a href="#rfc.section.4.4">Delayed ACKs</a></li>
@@ -539,13 +539,15 @@
 <p id="rfc.section.2.5.p.1">High connection completion rates will consume ephemeral ports quickly.  Lower the time during which connections are in FIN-WAIT-2/TIME_WAIT states so that they can be purged faster and thus maintain a maximal number of available sockets. The primitives for the assignment of these values were described in <a href="#RFC0793">[RFC0793]</a>, however significantly lower values are commonly used.</p>
 <h1 id="rfc.section.2.6"><a href="#rfc.section.2.6">2.6.</a> <a href="#reuse-sockets" id="reuse-sockets">Reuse sockets in TIME_WAIT state</a></h1>
 <p id="rfc.section.2.6.p.1">When running backend servers on a managed, low latency network you might allow the reuse of sockets in TIME_WAIT state for new connections when a protocol complete termination has occurred. There is no RFC that covers this behaviour.</p>
-<h1 id="rfc.section.2.7"><a href="#rfc.section.2.7">2.7.</a> <a href="#socket-buffers" id="socket-buffers">TCP socket buffer sizes and Window Scaling</a></h1>
-<p id="rfc.section.2.7.p.1">Systems meant to handle and serve a huge number of TCP connections at high speeds need a significant amount of memory for TCP socket buffers. On some systems you can tell the TCP stack what default buffer sizes to use and how much they are allowed to dynamically grow and shrink.  Window Scaling is typically linked to socket buffer sizes.</p>
-<p id="rfc.section.2.7.p.2">The minimum and default tend to require less proactive amendment than the maximum value. When deriving maximum values for use, you should consider the BDP (Bandwidth Delay Product) of the target environment and clients.  Consider also that &#8216;read&#8217; and &#8216;write&#8217; values do not require to be synchronised, as the BDP requirements for a load balancer or middle-box might be very different when acting as a sender or receiver.</p>
-<p id="rfc.section.2.7.p.3">Allowing needlessly high values beyond the expected limitations of the platform might increase the probability of retransmissions and buffer induced delays within the path. Extensions such as ECN coupled with AQM can help mitigate this undesirable behaviour <a href="#RFC7141">[RFC7141]</a>.</p>
-<p><a href="#RFC7323">[RFC7323]</a> covers Window Scaling in greater detail.</p>
-<h1 id="rfc.section.2.8"><a href="#rfc.section.2.8">2.8.</a> <a href="#max-window" id="max-window">Set maximum allowed TCP window sizes</a></h1>
-<p id="rfc.section.2.8.p.1">You may have to increase the largest allowed window size. Window scaling must be accommodated within the maximal values, however it is not uncommon to see the maximum definable higher than the scalable limit; these values can statically defined within socket parameters (SO_RCVBUF,SO_SNDBUF).</p>
+<h1 id="rfc.section.2.7"><a href="#rfc.section.2.7">2.7.</a> <a href="#socket-buffers" id="socket-buffers">TCP socket buffer sizes</a></h1>
+<p id="rfc.section.2.7.p.1">Systems meant to handle and serve a huge number of TCP connections at high speeds can require significant amounts of memory for TCP socket buffers to maintain performance. On some systems you can tell the TCP stack what default buffer sizes to use and how much they are allowed to dynamically grow and shrink.  Window Scaling is typically linked to socket buffer sizes.</p>
+<p id="rfc.section.2.7.p.2">The minimum and default values for socket buffers tend to require less proactive amendment than the maximum value. When deriving maximum values for use, you should consider the BDP (Bandwidth Delay Product) of the target environment and client paths.  Consider also that &#8216;read&#8217; and &#8216;write&#8217; values do not require to be synchronised, as the BDP for a load balancer or middle-box might be very different when acting as a sender or receiver due to the network charateristics in either context. e.g. A cache with fast, low latency network to an origin serving high latency clients.</p>
+<p id="rfc.section.2.7.p.3">Allowing needlessly high values beyond the expected limitations of the platform will not improve performance however can cause buffer induced delays within the path or excessive retransmissions during congestion events.  Extensions such as ECN coupled with AQM can help mitigate this undesirable behaviour <a href="#RFC7141">[RFC7141]</a>.</p>
+<h1 id="rfc.section.2.8"><a href="#rfc.section.2.8">2.8.</a> <a href="#window-scaling" id="window-scaling">TCP Window Scaling</a></h1>
+<p id="rfc.section.2.8.p.1">Window Scaling is provided as a function of the congestion control algorithm used on a platform. Initial and maximal values can usually be configured.</p>
+<p id="rfc.section.2.8.p.2">The window size used at connection startup is a calculated value using the MSS discovered during the 3WHS and the Initial Window (IW) in both send and receive contexts (initcwnd and initrwnd). <a href="#RFC7323">[RFC7323]</a> covers Window Scaling in greater detail.</p>
+<p id="rfc.section.2.8.p.3">You may have to increase the largest allowed window size from the system default to increase the throuput for high latency clients. Window scaling must be accommodated within the maximal values, however it is not uncommon to see the maximum definable higher than the scalable limit; these values can be statically defined within socket parameters (SO_RCVBUF,SO_SNDBUF).</p>
+<p id="rfc.section.2.8.p.4">Changes to the size of the window or incomplete window usage are common secondary symptoms of &#8216;slow transfer rates&#8217; on a loss free path. Locating the root cause of these symptoms, usually on the client or server system, is an important step commonly overlooked in favour of blaming the path.</p>
 <h1 id="rfc.section.2.9"><a href="#rfc.section.2.9">2.9.</a> <a href="#timers-and-timeouts" id="timers-and-timeouts">Timers and timeouts</a></h1>
 <p id="rfc.section.2.9.p.1">On a modern shared platform it can be common to plan for both long and short lived connections on the same implementation. However, the delivery of static assets and a &#8216;web push&#8217; or &#8216;long poll&#8217; service provide very different quality of service promises.</p>
 <p id="rfc.section.2.9.p.2">Fail &#8216;fast&#8217;: TCP resources can be highly contended. For fault tolerance reasons a server needs to be able to determine within a reasonable time frame whether a connection is still active or required. e.g. If static assets typically return in 100s of milliseconds, and users &#8216;switch off&#8217; after &lt;10s keeping timeouts of &gt;30s make little sense and defining a &#8216;quality of service&#8217; appropriate to the target platform is encouraged. On a shared platform with mixed session lifetimes, applications that require longer render times have various options to ensure the underlying service and upstream servers in the path can identify the session as not failed: HTTP continuations, Redirects, 202s or sending data.</p>
@@ -555,14 +557,14 @@
 <p id="rfc.section.3.1.p.1">TCP Fast Open (a.k.a. TFO, <a href="#RFC7413">[RFC7413]</a>) allows data to be sent on the TCP handshake, thereby allowing a request to be sent without any delay if a connection is not open.</p>
 <p id="rfc.section.3.1.p.2">TFO requires both client and server support, and additionally requires application knowledge, because the data sent on the SYN needs to be idempotent. Therefore, TFO can only be used on idempotent, safe HTTP methods (e.g., GET and HEAD), or with intervening negotiation (e.g, using TLS). It should be noted that TFO requires a secret to be defined on the server to mitigate security vulnerabilities it introduces. TFO therefore requires more server side deployment planning than other enhancements.</p>
 <p id="rfc.section.3.1.p.3">Support for TFO is growing in client platforms, especially mobile, due to the significant performance advantage it gives.</p>
-<h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#initial-congestion-window" id="initial-congestion-window">Initial Congestion Window</a></h1>
-<p><a href="#RFC6928">[RFC6928]</a> specifies an initcwnd (initial congestion window) of 10, and is now fairly widely deployed server-side. There has been experimentation with larger initial windows, in combination with packet pacing. Many implementations allow initcwnd to be applied to specific routes which allows a greater degree of flexibility than some other TCP parameters.</p>
-<p id="rfc.section.3.2.p.2">IW10 has been reported to perform fairly well even in high volume servers.</p>
+<h1 id="rfc.section.3.2"><a href="#rfc.section.3.2">3.2.</a> <a href="#IW" id="IW">Initial Window</a></h1>
+<p><a href="#RFC6928">[RFC6928]</a> proposes a new IW of 10*MSS, and is now fairly widely deployed server-side. Many implementations allow you to tune both initcwnd and initrwnd values. Some implementations allow these values to be applied to specific routes which allows a greater degree of control over known paths.</p>
+<p id="rfc.section.3.2.p.2">There has been experimentation with larger initial windows in combination with packet pacing, however IW10 has been reported to perform fairly well even in both general and high volume use cases.</p>
 <h1 id="rfc.section.3.3"><a href="#rfc.section.3.3">3.3.</a> <a href="#tcp-syn-flood-handling" id="tcp-syn-flood-handling">TCP SYN flood handling</a></h1>
 <p id="rfc.section.3.3.p.1">TCP SYN Flood mitigations <a href="#RFC4987">[RFC4987]</a> are necessary and there will be thresholds to tweak.</p>
 <h1 id="rfc.section.4"><a href="#rfc.section.4">4.</a> <a href="#tcp-transfers" id="tcp-transfers">TCP transfers</a></h1>
-<h1 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a> <a href="#packet-pacing" id="packet-pacing">Packet Pacing</a></h1>
-<p id="rfc.section.4.1.p.1">TBD</p>
+<h1 id="rfc.section.4.1"><a href="#rfc.section.4.1">4.1.</a> <a href="#packet-scheduling-and-flow-control" id="packet-scheduling-and-flow-control">Packet scheduling and flow control</a></h1>
+<p id="rfc.section.4.1.p.1">TBD cubic codel pacing</p>
 <h1 id="rfc.section.4.2"><a href="#rfc.section.4.2">4.2.</a> <a href="#explicit-congestion-control" id="explicit-congestion-control">Explicit Congestion Control</a></h1>
 <p id="rfc.section.4.2.p.1">Apple <a href="https://developer.apple.com/videos/wwdc/2015/?id=719">deploying in iOS and OSX</a>.</p>
 <h1 id="rfc.section.4.3"><a href="#rfc.section.4.3">4.3.</a> <a href="#nagle" id="nagle">Nagle&#8217;s Algorithm</a></h1>
@@ -735,13 +737,13 @@ net.ipv4.tcp_wmem = &lt;minimum size&gt; &lt;default size&gt; &lt;max size in by
 net.ipv4.tcp_rmem = &lt;minimum size&gt; &lt;default size&gt; &lt;max size in bytes&gt;
 </pre>
 <p>
-  <a href="#max-window">Section 2.8</a>
+  <a href="#window-scaling">Section 2.8</a>
 </p>
 <pre>
 net.core.rmem_max = &lt;number of bytes&gt;
 </pre>
 <p>
-  <a href="#max-window">Section 2.8</a>
+  <a href="#window-scaling">Section 2.8</a>
 </p>
 <pre>
 net.core.wmem_max = &lt;number of bytes&gt;

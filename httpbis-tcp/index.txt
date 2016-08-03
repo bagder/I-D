@@ -4,8 +4,8 @@
 
 httpbis                                                      D. Stenberg
 Internet-Draft                                                   Mozilla
-Intended status: Best Current Practice                    March 16, 2016
-Expires: September 17, 2016
+Intended status: Best Current Practice                    August 3, 2016
+Expires: February 4, 2017
 
 
                           TCP Tuning for HTTP
@@ -31,7 +31,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on September 17, 2016.
+   This Internet-Draft will expire on February 4, 2017.
 
 Copyright Notice
 
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Stenberg               Expires September 17, 2016               [Page 1]
+Stenberg                Expires February 4, 2017                [Page 1]
 
-Internet-Draft                TCP for HTTP                    March 2016
+Internet-Draft                TCP for HTTP                   August 2016
 
 
 Table of Contents
@@ -69,35 +69,35 @@ Table of Contents
      2.4.  Use the whole port range for local ports  . . . . . . . .   4
      2.5.  Lower the TCP FIN timeout . . . . . . . . . . . . . . . .   4
      2.6.  Reuse sockets in TIME_WAIT state  . . . . . . . . . . . .   4
-     2.7.  TCP socket buffer sizes and Window Scaling  . . . . . . .   4
-     2.8.  Set maximum allowed TCP window sizes  . . . . . . . . . .   5
+     2.7.  TCP socket buffer sizes . . . . . . . . . . . . . . . . .   4
+     2.8.  TCP Window Scaling  . . . . . . . . . . . . . . . . . . .   5
      2.9.  Timers and timeouts . . . . . . . . . . . . . . . . . . .   5
-   3.  TCP handshake . . . . . . . . . . . . . . . . . . . . . . . .   5
-     3.1.  TCP Fast Open . . . . . . . . . . . . . . . . . . . . . .   5
-     3.2.  Initial Congestion Window . . . . . . . . . . . . . . . .   6
+   3.  TCP handshake . . . . . . . . . . . . . . . . . . . . . . . .   6
+     3.1.  TCP Fast Open . . . . . . . . . . . . . . . . . . . . . .   6
+     3.2.  Initial Window  . . . . . . . . . . . . . . . . . . . . .   6
      3.3.  TCP SYN flood handling  . . . . . . . . . . . . . . . . .   6
-   4.  TCP transfers . . . . . . . . . . . . . . . . . . . . . . . .   6
-     4.1.  Packet Pacing . . . . . . . . . . . . . . . . . . . . . .   6
-     4.2.  Explicit Congestion Control . . . . . . . . . . . . . . .   6
-     4.3.  Nagle's Algorithm . . . . . . . . . . . . . . . . . . . .   6
+   4.  TCP transfers . . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.1.  Packet scheduling and flow control  . . . . . . . . . . .   7
+     4.2.  Explicit Congestion Control . . . . . . . . . . . . . . .   7
+     4.3.  Nagle's Algorithm . . . . . . . . . . . . . . . . . . . .   7
      4.4.  Delayed ACKs  . . . . . . . . . . . . . . . . . . . . . .   7
-     4.5.  Keep-alive  . . . . . . . . . . . . . . . . . . . . . . .   7
+     4.5.  Keep-alive  . . . . . . . . . . . . . . . . . . . . . . .   8
    5.  Re-using connections  . . . . . . . . . . . . . . . . . . . .   8
      5.1.  Slow Start after Idle . . . . . . . . . . . . . . . . . .   8
      5.2.  TCP-Bound Authentications . . . . . . . . . . . . . . . .   8
-   6.  Closing connections . . . . . . . . . . . . . . . . . . . . .   8
-     6.1.  Half-close  . . . . . . . . . . . . . . . . . . . . . . .   8
-     6.2.  Abort . . . . . . . . . . . . . . . . . . . . . . . . . .   8
-     6.3.  Close Idle Connections  . . . . . . . . . . . . . . . . .   8
+   6.  Closing connections . . . . . . . . . . . . . . . . . . . . .   9
+     6.1.  Half-close  . . . . . . . . . . . . . . . . . . . . . . .   9
+     6.2.  Abort . . . . . . . . . . . . . . . . . . . . . . . . . .   9
+     6.3.  Close Idle Connections  . . . . . . . . . . . . . . . . .   9
      6.4.  Tail Loss Probes  . . . . . . . . . . . . . . . . . . . .   9
    7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    8.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
    9.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
      9.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
-     9.2.  Informative References  . . . . . . . . . . . . . . . . .   9
-     9.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  10
-   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  10
-   Appendix B.  Operating System Settings for Linux  . . . . . . . .  10
+     9.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+     9.3.  URIs  . . . . . . . . . . . . . . . . . . . . . . . . . .  11
+   Appendix A.  Acknowledgments  . . . . . . . . . . . . . . . . . .  11
+   Appendix B.  Operating System Settings for Linux  . . . . . . . .  11
    Author's Address  . . . . . . . . . . . . . . . . . . . . . . . .  12
 
 1.  Introduction
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Stenberg               Expires September 17, 2016               [Page 2]
+Stenberg                Expires February 4, 2017                [Page 2]
 
-Internet-Draft                TCP for HTTP                    March 2016
+Internet-Draft                TCP for HTTP                   August 2016
 
 
    current practice for using HTTP over TCP, with a focus on improving
@@ -165,9 +165,9 @@ Internet-Draft                TCP for HTTP                    March 2016
 
 
 
-Stenberg               Expires September 17, 2016               [Page 3]
+Stenberg                Expires February 4, 2017                [Page 3]
 
-Internet-Draft                TCP for HTTP                    March 2016
+Internet-Draft                TCP for HTTP                   August 2016
 
 
    backlog queue for both of these states.  Newer implemntations use two
@@ -196,45 +196,62 @@ Internet-Draft                TCP for HTTP                    March 2016
    connections when a protocol complete termination has occurred.  There
    is no RFC that covers this behaviour.
 
-2.7.  TCP socket buffer sizes and Window Scaling
+2.7.  TCP socket buffer sizes
 
    Systems meant to handle and serve a huge number of TCP connections at
-   high speeds need a significant amount of memory for TCP socket
-   buffers.  On some systems you can tell the TCP stack what default
-   buffer sizes to use and how much they are allowed to dynamically grow
-   and shrink.  Window Scaling is typically linked to socket buffer
-   sizes.
+   high speeds can require significant amounts of memory for TCP socket
+   buffers to maintain performance.  On some systems you can tell the
+   TCP stack what default buffer sizes to use and how much they are
+   allowed to dynamically grow and shrink.  Window Scaling is typically
+   linked to socket buffer sizes.
 
-   The minimum and default tend to require less proactive amendment than
-   the maximum value.  When deriving maximum values for use, you should
-   consider the BDP (Bandwidth Delay Product) of the target environment
-   and clients.  Consider also that 'read' and 'write' values do not
-   require to be synchronised, as the BDP requirements for a load
-   balancer or middle-box might be very different when acting as a
-   sender or receiver.
+   The minimum and default values for socket buffers tend to require
+   less proactive amendment than the maximum value.  When deriving
+   maximum values for use, you should consider the BDP (Bandwidth Delay
+   Product) of the target environment and client paths.  Consider also
+   that 'read' and 'write' values do not require to be synchronised, as
+   the BDP for a load balancer or middle-box might be very different
+   when acting as a sender or receiver due to the network charateristics
+   in either context. e.g.  A cache with fast, low latency network to an
+   origin serving high latency clients.
 
    Allowing needlessly high values beyond the expected limitations of
-   the platform might increase the probability of retransmissions and
-   buffer induced delays within the path.  Extensions such as ECN
-   coupled with AQM can help mitigate this undesirable behaviour
-   [RFC7141].
+   the platform will not improve performance however can cause buffer
+   induced delays within the path or excessive retransmissions during
 
 
 
-Stenberg               Expires September 17, 2016               [Page 4]
+Stenberg                Expires February 4, 2017                [Page 4]
 
-Internet-Draft                TCP for HTTP                    March 2016
+Internet-Draft                TCP for HTTP                   August 2016
 
 
-   [RFC7323] covers Window Scaling in greater detail.
+   congestion events.  Extensions such as ECN coupled with AQM can help
+   mitigate this undesirable behaviour [RFC7141].
 
-2.8.  Set maximum allowed TCP window sizes
+2.8.  TCP Window Scaling
 
-   You may have to increase the largest allowed window size.  Window
-   scaling must be accommodated within the maximal values, however it is
-   not uncommon to see the maximum definable higher than the scalable
-   limit; these values can statically defined within socket parameters
-   (SO_RCVBUF,SO_SNDBUF).
+   Window Scaling is provided as a function of the congestion control
+   algorithm used on a platform.  Initial and maximal values can usually
+   be configured.
+
+   The window size used at connection startup is a calculated value
+   using the MSS discovered during the 3WHS and the Initial Window (IW)
+   in both send and receive contexts (initcwnd and initrwnd).  [RFC7323]
+   covers Window Scaling in greater detail.
+
+   You may have to increase the largest allowed window size from the
+   system default to increase the throuput for high latency clients.
+   Window scaling must be accommodated within the maximal values,
+   however it is not uncommon to see the maximum definable higher than
+   the scalable limit; these values can be statically defined within
+   socket parameters (SO_RCVBUF,SO_SNDBUF).
+
+   Changes to the size of the window or incomplete window usage are
+   common secondary symptoms of 'slow transfer rates' on a loss free
+   path.  Locating the root cause of these symptoms, usually on the
+   client or server system, is an important step commonly overlooked in
+   favour of blaming the path.
 
 2.9.  Timers and timeouts
 
@@ -257,6 +274,14 @@ Internet-Draft                TCP for HTTP                    March 2016
 
    Clients and servers typically have many timeout options, a few
    notable options are: Connect(client), time to request(server), time
+
+
+
+Stenberg                Expires February 4, 2017                [Page 5]
+
+Internet-Draft                TCP for HTTP                   August 2016
+
+
    to first byte(client), between bytes(server/client), total connection
    time(server/client).  Some implementations merge these values into a
    single 'timeout' definition even when statistics are reported
@@ -274,14 +299,6 @@ Internet-Draft                TCP for HTTP                    March 2016
 
    TFO requires both client and server support, and additionally
    requires application knowledge, because the data sent on the SYN
-
-
-
-Stenberg               Expires September 17, 2016               [Page 5]
-
-Internet-Draft                TCP for HTTP                    March 2016
-
-
    needs to be idempotent.  Therefore, TFO can only be used on
    idempotent, safe HTTP methods (e.g., GET and HEAD), or with
    intervening negotiation (e.g, using TLS).  It should be noted that
@@ -292,28 +309,40 @@ Internet-Draft                TCP for HTTP                    March 2016
    Support for TFO is growing in client platforms, especially mobile,
    due to the significant performance advantage it gives.
 
-3.2.  Initial Congestion Window
+3.2.  Initial Window
 
-   [RFC6928] specifies an initcwnd (initial congestion window) of 10,
-   and is now fairly widely deployed server-side.  There has been
-   experimentation with larger initial windows, in combination with
-   packet pacing.  Many implementations allow initcwnd to be applied to
-   specific routes which allows a greater degree of flexibility than
-   some other TCP parameters.
+   [RFC6928] proposes a new IW of 10*MSS, and is now fairly widely
+   deployed server-side.  Many implementations allow you to tune both
+   initcwnd and initrwnd values.  Some implementations allow these
+   values to be applied to specific routes which allows a greater degree
+   of control over known paths.
 
-   IW10 has been reported to perform fairly well even in high volume
-   servers.
+   There has been experimentation with larger initial windows in
+   combination with packet pacing, however IW10 has been reported to
+   perform fairly well even in both general and high volume use cases.
 
 3.3.  TCP SYN flood handling
 
    TCP SYN Flood mitigations [RFC4987] are necessary and there will be
    thresholds to tweak.
 
+
+
+
+
+
+
+
+Stenberg                Expires February 4, 2017                [Page 6]
+
+Internet-Draft                TCP for HTTP                   August 2016
+
+
 4.  TCP transfers
 
-4.1.  Packet Pacing
+4.1.  Packet scheduling and flow control
 
-   TBD
+   TBD cubic codel pacing
 
 4.2.  Explicit Congestion Control
 
@@ -330,13 +359,6 @@ Internet-Draft                TCP for HTTP                    March 2016
    fast even during transfers that are perceived as single direction
    transfers.  Even small delays in those sends can cause a significant
    performance loss.
-
-
-
-Stenberg               Expires September 17, 2016               [Page 6]
-
-Internet-Draft                TCP for HTTP                    March 2016
-
 
    HTTP/1.1 is also affected, especially when sending off a full request
    in a single write() system call.
@@ -364,6 +386,14 @@ Internet-Draft                TCP for HTTP                    March 2016
 
    Delayed ACKs can be useful in situations where it is reasonable to
    assume that a data packet will almost immediately (within 500ms)
+
+
+
+Stenberg                Expires February 4, 2017                [Page 7]
+
+Internet-Draft                TCP for HTTP                   August 2016
+
+
    cause data to be sent in the other direction.  In general in both
    HTTP/1.1 and HTTP/2 this is unlikely: therefore, disabling Delayed
    ACKs can provide an improvement in latency.
@@ -385,15 +415,6 @@ Internet-Draft                TCP for HTTP                    March 2016
 
    TCP keep-alive is likely disabled - at least on mobile clients for
    energy saving purposes.  App-level keep-alive is then required for
-
-
-
-
-Stenberg               Expires September 17, 2016               [Page 7]
-
-Internet-Draft                TCP for HTTP                    March 2016
-
-
    long-lived requests to detect failed peers or connections reset by
    stateful firewalls etc.
 
@@ -416,6 +437,18 @@ Internet-Draft                TCP for HTTP                    March 2016
    that connection can remain authenticated throughout the rest of its
    lifetime.  This discrepancy with how other HTTP authentications work
    makes it important to handle these connections with care.
+
+
+
+
+
+
+
+
+Stenberg                Expires February 4, 2017                [Page 8]
+
+Internet-Draft                TCP for HTTP                   August 2016
+
 
 6.  Closing connections
 
@@ -441,15 +474,6 @@ Internet-Draft                TCP for HTTP                    March 2016
    Keeping open connections around for subsequent connection reuse is
    key for many HTTP clients' performance.  The value of an existing
    connection quickly degrades and after only a few minutes the chance
-
-
-
-
-Stenberg               Expires September 17, 2016               [Page 8]
-
-Internet-Draft                TCP for HTTP                    March 2016
-
-
    that a connection will successfully get reused by a web browser is
    slim.
 
@@ -472,6 +496,15 @@ Internet-Draft                TCP for HTTP                    March 2016
    [RFC0793]  Postel, J., "Transmission Control Protocol", STD 7,
               RFC 793, DOI 10.17487/RFC0793, September 1981,
               <http://www.rfc-editor.org/info/rfc793>.
+
+
+
+
+
+Stenberg                Expires February 4, 2017                [Page 9]
+
+Internet-Draft                TCP for HTTP                   August 2016
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119,
@@ -499,13 +532,6 @@ Internet-Draft                TCP for HTTP                    March 2016
               DOI 10.17487/RFC1122, October 1989,
               <http://www.rfc-editor.org/info/rfc1122>.
 
-
-
-Stenberg               Expires September 17, 2016               [Page 9]
-
-Internet-Draft                TCP for HTTP                    March 2016
-
-
    [RFC4987]  Eddy, W., "TCP SYN Flooding Attacks and Common
               Mitigations", RFC 4987, DOI 10.17487/RFC4987, August 2007,
               <http://www.rfc-editor.org/info/rfc4987>.
@@ -527,6 +553,14 @@ Internet-Draft                TCP for HTTP                    March 2016
    [RFC7413]  Cheng, Y., Chu, J., Radhakrishnan, S., and A. Jain, "TCP
               Fast Open", RFC 7413, DOI 10.17487/RFC7413, December 2014,
               <http://www.rfc-editor.org/info/rfc7413>.
+
+
+
+
+Stenberg                Expires February 4, 2017               [Page 10]
+
+Internet-Draft                TCP for HTTP                   August 2016
+
 
 9.3.  URIs
 
@@ -554,14 +588,6 @@ Appendix B.  Operating System Settings for Linux
 
    Section 2.3
 
-
-
-
-Stenberg               Expires September 17, 2016              [Page 10]
-
-Internet-Draft                TCP for HTTP                    March 2016
-
-
    net.core.somaxconn = <number>
 
    Section 2.4
@@ -583,6 +609,14 @@ Internet-Draft                TCP for HTTP                    March 2016
    Section 2.7
 
    net.ipv4.tcp_rmem = <minimum size> <default size> <max size in bytes>
+
+
+
+
+Stenberg                Expires February 4, 2017               [Page 11]
+
+Internet-Draft                TCP for HTTP                   August 2016
+
 
    Section 2.8
 
@@ -608,15 +642,6 @@ Internet-Draft                TCP for HTTP                    March 2016
 
    int one = 1;
    setsockopt(fd, IPPROTO_TCP, TCP_QUICKACK, &one, sizeof(one));
-
-
-
-
-
-Stenberg               Expires September 17, 2016              [Page 11]
-
-Internet-Draft                TCP for HTTP                    March 2016
-
 
    Unlike disabling Nagle's Algorithm, disabling Delayed ACKs on Linux
    is not a one-time operation: processing within the TCP stack can
@@ -644,29 +669,4 @@ Author's Address
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Stenberg               Expires September 17, 2016              [Page 12]
+Stenberg                Expires February 4, 2017               [Page 12]
